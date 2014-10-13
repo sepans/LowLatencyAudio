@@ -69,6 +69,15 @@ public class PGPolyphonicVoice implements OnPreparedListener, OnCompletionListen
 			mp.start();
 		}
 	}
+
+	public void pause() throws IOException
+	{
+		if ( mp.isLooping() || mp.isPlaying() )
+		{
+			state = INVALID;
+			mp.pause();
+		}
+	}
 	
 	public void stop() throws IOException
 	{
@@ -90,6 +99,13 @@ public class PGPolyphonicVoice implements OnPreparedListener, OnCompletionListen
 		this.stop();
 		mp.release();
 	}
+
+	public void volume(float left, float right) {
+		
+		mp.setVolume(left,right);
+		
+	}
+
 	
 	public void onPrepared(MediaPlayer mPlayer) 
 	{

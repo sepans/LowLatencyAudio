@@ -16,6 +16,10 @@ var LowLatencyAudio = {
 		return exec(success, fail, "LowLatencyAudio", "play", [id]);
 	},
 
+	pause: function (id, success, fail) {
+		return exec(success, fail, "LowLatencyAudio", "pause", [id]);
+	},
+
 	stop: function (id, success, fail) {
 		return exec(success, fail, "LowLatencyAudio", "stop", [id]);
 	},
@@ -26,7 +30,12 @@ var LowLatencyAudio = {
 
 	unload: function (id, success, fail) {
 		return exec(success, fail, "LowLatencyAudio", "unload", [id]);
+	},
+
+	volume: function (id, left, right, success, fail) {
+    	return cordova.exec(success, fail, "LowLatencyAudio", "volume", [id,left,right]);
 	}
+
 };
 
 module.exports = LowLatencyAudio;

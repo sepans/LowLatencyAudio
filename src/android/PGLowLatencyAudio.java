@@ -40,8 +40,11 @@ public class PGLowLatencyAudio extends CordovaPlugin {
 	public static final String PRELOAD_AUDIO="preloadAudio";
 	public static final String PLAY="play";
 	public static final String STOP="stop";
+	public static final String PAUSE="pause";
 	public static final String LOOP="loop";
 	public static final String UNLOAD="unload";
+	public static final String VOLUME="volume";
+
 	
 	public static final int DEFAULT_POLYPHONY_VOICES = 15;
 	
@@ -156,12 +159,17 @@ public class PGLowLatencyAudio extends CordovaPlugin {
 					return false;
 				}
 			}
-			else if ( STOP.equals( action ) || UNLOAD.equals( action ) ) 
+			else if ( STOP.equals( action ) || PAUSE.equals( action ) || UNLOAD.equals( action ) ) 
 			{
 				if ( assetMap.containsKey(audioID) )
 				{
 					PGLowLatencyAudioAsset asset = assetMap.get( audioID );
-					asset.stop();
+					if(PAUSE.equals( action )) {
+						asset.pause();	
+					} 
+					else {
+						asset.stop();	
+					}  
 					
 					callbackContext.success("OK");
 					return true;
@@ -171,8 +179,15 @@ public class PGLowLatencyAudio extends CordovaPlugin {
 					ArrayList<Integer> streams = streamMap.get( audioID );
 					if ( streams != null )
 					{
-						for ( int x=0; x< streams.size(); x++)
-						soundPool.stop( streams.get(x) );
+						for ( int x=0; x< streams.size(); x++) {
+							if(PAUSE.equals( action )) {
+								soundPool.pause( streams.get(x) );
+							} 
+							else {
+								soundPool.stop( streams.get(x) );
+							}  
+
+						}
 					}
 					streamMap.remove( audioID );
 					
@@ -212,6 +227,39 @@ public class PGLowLatencyAudio extends CordovaPlugin {
 					return false;
 				}
 			}
+			if ( VOLUME.equals( action ) ) 
+			{
+				float volLeft = (float) args.getDouble(1);
+				float volRight = (float) args.getDouble(2);
+				if ( assetMap.containsKey(audioID) ) {
+					
+					PGLowLatencyAudioAsset asset = assetMap.get( audioID );
+					asset.volume(volLeft, volRight);
+
+					callbackContext.success("OK");
+					return true;
+
+				}
+				else if ( soundMap.containsKey(audioID) ){
+					//TODO test
+					ArrayList<Integer> streams = streamMap.get( audioID );
+
+					if ( streams != null )
+					{
+						for ( int x=0; x< streams.size(); x++) {
+							soundPool.setVolume(streams.get(x), volLeft, volRight);
+						}
+					}
+					callbackContext.success("OK");
+					return true;
+				}
+				else 
+				{
+					//TODO error handling
+					return false;
+				}
+			}		 
+
 			
 		} 
 		catch (Exception ex) 
